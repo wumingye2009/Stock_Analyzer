@@ -54,16 +54,20 @@ class TechnicalBase(ABC):
         """计算标准化波动率指标"""
         if window <= 0:
             raise ValueError("窗口期必须为正整数")
+        # if window > len(df):
+        #     window = len(df)
             
         wap = cls.weighted_price(df)
         ma = df['收盘'].rolling(window=window, min_periods=1).mean()
+        result = (wap - ma).abs() / ma
+        return pd.Series(result, index=df.index, name='标准化波动率')
         
         # 标准化波动率公式（行业通用实现）
         # return (wap - ma).abs() / ma.rolling(window=window).std()
-        volatility = (wap - ma).abs() / ma.rolling(window=window, min_periods=1).std()
-        # 处理NaN值（避免影响后续计算）     
-        volatility.fillna(0, inplace=True)
-        return pd.Series(volatility, index=df.index, name='标准化波动率')   
+        # volatility = (wap - ma).abs() / ma.rolling(window=window, min_periods=1).std()
+        # # 处理NaN值（避免影响后续计算）     
+        # volatility.fillna(0, inplace=True)
+        # return pd.Series(volatility, index=df.index, name='标准化波动率')   
     
     @staticmethod
     def dynamic_ma(series: pd.Series, alpha_series: pd.Series) -> pd.Series:
