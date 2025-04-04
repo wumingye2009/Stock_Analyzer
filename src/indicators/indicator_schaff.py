@@ -19,17 +19,18 @@ class SchaffChannel(TechnicalIndicator):
         weight_avg_series = TechnicalBase.weighted_price(df)
 
         
-        df['AA'] = weight_avg_series.rolling(
-            window=self.window,
-            min_periods=1
-            ).mean()          # df['AA'] 是 pandas.Series
-        df['AA'].bfill(inplace=True)                                                      # 避免 NaN 影响
+        df['AA'] = weight_avg_series.rolling(window=self.window,min_periods=1).mean()                                # df['AA'] 是 pandas.Series
+        df['AA'].bfill(inplace=True)                # 避免 NaN 影响
         # print(df['AA'].head(10))
         
         # 计算 CC（波动率）
-        df['CC'] = TechnicalBase.volatility(df, window=20).squeeze()
+        df['CC'] = TechnicalBase.volatility(df, window=20).squeeze()        # df['CC'] 是 pandas.Series        
+        """ 
+        .squeeze() 是 Pandas 的方法，用于去除维度为 1 的轴（行或列）。它适用于 DataFrame 和 Series：
+        如果 .squeeze() 作用于 DataFrame，且 DataFrame 只有一列或一行，它会转换为 Series。
+        如果 .squeeze() 作用于 Series，它不会有任何效果（不会出错）。
         print(df['CC'].head(10))
-        # df['CC'] 是 pandas.Series
+        """
 
 
         # 计算 DD（动态移动均线）   df['DD'] 是 pandas.Series

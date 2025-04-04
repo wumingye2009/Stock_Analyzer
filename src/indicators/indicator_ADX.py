@@ -1,6 +1,6 @@
-# src/indicators/adx.py
+# src/indicators/indicator_adx.py
 import pandas as pd
-from src.indicators.technical import TechnicalIndicator  # 导入基类
+from .technical import TechnicalIndicator  # 导入基类
 
 
 class ADX(TechnicalIndicator):

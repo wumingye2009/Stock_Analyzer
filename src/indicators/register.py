@@ -65,13 +65,15 @@ def register_indicator(module_name):
     # dir()在Python中用于列出一个对象的所有属性和方法。
     # 当传入一个模块对象时，它会返回列表包含:模块中所有定义的名称，比如函数、类、变量等。
         cls = getattr(module, cls_name)             # 获取类对象
-        if hasattr(cls, 'INDICATOR_NAME'):          # 检查类是否有INDICATOR_NAME属性
+        if hasattr(cls, 'INDICATOR_NAME') and cls.INDICATOR_NAME:  # 检查类是否有INDICATOR_NAME属性且不为空
             INDICATOR_REGISTRY[cls.INDICATOR_NAME] = cls
             print(f"注册指标: {cls.INDICATOR_NAME}")
+        elif hasattr(cls, 'INDICATOR_NAME'):
+            print(f"警告: 发现未命名的指标类 {cls.__name__}")
 
 def register_all_indicators():
     """自动发现所有指标模块"""
-    indicator_files = ["indicator_schaff", "indicator_ADX"]
+    indicator_files = ["indicator_schaff", "indicator_ADX", "indicator_macd"]
     for file in indicator_files:
         register_indicator(file)
 

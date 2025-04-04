@@ -30,8 +30,7 @@ class TechnicalIndicator(ABC):  # 定义技术指标抽象基类
 
 class TechnicalBase(ABC):
     """技术指标基类，所有指标必须继承此类"""
-    
-    INDICATOR_NAME = None  # 子类必须重写该属性
+    # IS_BASE_CLASS = True  # 标记为基类，不应被注册
     
     @classmethod
     def weighted_price(cls, df: pd.DataFrame) -> pd.Series:
@@ -51,7 +50,7 @@ class TechnicalBase(ABC):
     
     @classmethod
     def volatility(cls, df: pd.DataFrame, window: int = 20) -> pd.Series:
-        """计算标准化波动率指标"""
+        """计算波动率指标  (这个不是标准化波动率，只是简单的波动率，标准化波动率需要用到标准差  result = (wap - ma).abs() / ma.rolling(window=window, min_periods=1).std())"""
         if window <= 0:
             raise ValueError("窗口期必须为正整数")
         # if window > len(df):
@@ -60,6 +59,9 @@ class TechnicalBase(ABC):
         wap = cls.weighted_price(df)
         ma = df['收盘'].rolling(window=window, min_periods=1).mean()
         result = (wap - ma).abs() / ma
+        # result = (wap - ma).abs() / ma.rolling(window=window, min_periods=1).std()      #  # 使用滚动标准差计算波动率
+        # 处理NaN值（避免影响后续计算）
+        result.fillna(0, inplace=True)
         return pd.Series(result, index=df.index, name='标准化波动率')
         
         # 标准化波动率公式（行业通用实现）
@@ -87,5 +89,3 @@ class TechnicalBase(ABC):
         
         for i in range(1, len(values)):
             result[i] = alpha[i] * values[i] + (1 - alpha[i]) * result[i-1]
-        
-        return pd.Series(result, index=series.index, name='动态移动平均')
