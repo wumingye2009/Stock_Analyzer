@@ -37,11 +37,23 @@ class SchaffChannel(TechnicalIndicator):
         df['DD'] = TechnicalBase.dynamic_ma(df['AA'], alpha_series=df['CC'])
 
 
-        # 计算通道
-        df['静态支撑带'] = df['AA'] * self.N / 100
-        df['静态压力带'] = df['AA'] * (200 - self.N) / 100
-        df['动态趋势上轨'] = (1 + self.M/100) * df['DD']
-        df['动态趋势下轨'] = (1 - self.M/100) * df['DD']
+        # 计算ATR（Average True Range）作为通道宽度基数
+        df['ATR'] = TechnicalBase.average_true_range(df, self.window)
+        
+        # 计算静态通道
+        # 使用布林带原理计算静态通道，更准确地反映价格波动范围
+        rolling_window = 20  # 滚动窗口大小
+        rolling_mean = df['AA'].rolling(window=rolling_window, min_periods=1).mean()
+        rolling_std = df['AA'].rolling(window=rolling_window, min_periods=1).std()
+        
+        # 设置静态通道为均线上下一定倍数的标准差
+        df['静态支撑带'] = rolling_mean - self.N / 100 * rolling_std
+        df['静态压力带'] = rolling_mean + self.N / 100 * rolling_std
+        
+        # 使用ATR作为动态通道宽度
+        channel_width = self.M * df['ATR']
+        df['动态趋势上轨'] = df['DD'] + channel_width
+        df['动态趋势下轨'] = df['DD'] - channel_width
         
         # 确保返回仅包含所需的 4 列
         # return df[['静态支撑带', '静态压力带', '动态趋势上轨', '动态趋势下轨']]

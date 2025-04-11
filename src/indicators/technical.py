@@ -89,3 +89,20 @@ class TechnicalBase(ABC):
         
         for i in range(1, len(values)):
             result[i] = alpha[i] * values[i] + (1 - alpha[i]) * result[i-1]
+        return pd.Series(result, index=series.index, name='DMA')
+
+    @staticmethod
+    def get_true_range(df: pd.DataFrame) -> pd.Series:
+        """计算真实波幅（TR）"""
+        high_low = df['最高'] - df['最低']
+        high_close = (df['最高'] - df['收盘'].shift(1)).abs()
+        low_close = (df['最低'] - df['收盘'].shift(1)).abs()
+        tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+        return pd.Series(tr, index=df.index, name='TR')
+
+    @staticmethod
+    def average_true_range(df: pd.DataFrame, window: int = 14) -> pd.Series:
+        """计算平均真实波幅（ATR）"""
+        tr = TechnicalBase.get_true_range(df)
+        atr = tr.rolling(window=window, min_periods=1).mean()
+        return pd.Series(atr, index=df.index, name='ATR')
