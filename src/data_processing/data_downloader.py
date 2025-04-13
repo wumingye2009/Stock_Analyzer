@@ -19,15 +19,14 @@ def get_stock_type(symbol: str) -> str:
     else:
         return 'us'  # 美股
 
-def get_filename(symbol: str, name: str) -> str:
+def get_filename(symbol: str, name: str, end_date: str) -> str:
     """生成符合要求的文件名"""
-    today = datetime.now().strftime('%Y%m%d')
     stock_type = get_stock_type(symbol)
     
     if stock_type in ['sh', 'sz']:
-        return f"{symbol}_{name}_his_{today}.csv"
+        return f"{symbol}_{name}_his_{end_date}.csv"
     else:
-        return f"{symbol}_his_{today}.csv"
+        return f"{symbol}_his_{end_date}.csv"
 
 class StockDataDownloader:
     def __init__(self, symbols: Union[str, List[str]], start_date: str, end_date: str):
@@ -64,7 +63,7 @@ class StockDataDownloader:
                     adjust="qfq"
                 )
                 
-                filename = get_filename(symbol, cleaned_name)
+                filename = get_filename(symbol, cleaned_name, self.end_date)
                 filepath = self.data_dir / filename
                 df.to_csv(filepath, index=False, encoding="utf_8_sig")
                 print(f"✅ 成功保存: {filepath}")
