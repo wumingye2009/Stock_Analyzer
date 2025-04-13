@@ -1,6 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib.font_manager import FontProperties
+
+# 设置中文字体
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 def plot_xuess_channel(df, stock_code):
     """薛斯通道可视化"""
